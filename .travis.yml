@@ -31,6 +31,6 @@ script:
   - coverage run --source=teacher_app/apps manage.py test teacher_app/apps
   - coverage report
 
-  after_success:
-   #send coverage to coveralls
-   - coveralls
+after_success:
+  #send coverage to coveralls
+  - coveralls

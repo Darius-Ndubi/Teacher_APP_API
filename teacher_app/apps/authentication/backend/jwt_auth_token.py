@@ -43,7 +43,6 @@ class UserAuthToken(TokenAuthentication):
         # ONLY when the token is valid return the user and the decoded payload
         try:
             payload = jwt.decode(key, os.getenv("SECRET_KEY"))
-
             user = get_user_model().objects.get(email=payload["email"])
 
         except jwt.ExpiredSignatureError:

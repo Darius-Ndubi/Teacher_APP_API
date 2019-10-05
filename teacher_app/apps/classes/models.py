@@ -1,6 +1,5 @@
 from django.db import models
 
-
 from teacher_app.apps.authentication.models import User
 
 """
@@ -29,3 +28,17 @@ class Student(models.Model):
     regNumber = models.CharField("Students registration number",
                                  max_length=50, unique=True)
     className = models.ForeignKey(StudentClass, on_delete=models.CASCADE)
+
+
+class StudentSubjectMath(models.Model):
+    score = models.IntegerField(default=0)
+    assign = models.BooleanField(default=False)
+    student_reg_num = models.CharField(unique=True, max_length=254)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+
+class StudentSubjectEng(models.Model):
+    score = models.IntegerField(default=0)
+    assign = models.BooleanField(default=False)
+    student_reg_num = models.CharField(unique=True, max_length=254)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
