@@ -108,3 +108,6 @@ venv.bak/
 
 # Ds file
 .DS_Store 
+
+# Docker env db
+teacher_app_db/

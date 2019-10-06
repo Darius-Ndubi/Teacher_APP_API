@@ -1,0 +1,49 @@
+version: "3.7"
+services:
+  # Setup database service.
+  # user environment declaration to set up dbname and password
+  # Set the port for host connection to 5344
+  database:
+    restart: always
+    image: postgres:10.10
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=tktktktktkt
+      - POSTGRES_DB=teacher_app_db
+    volumes:
+      - ./teacher_app_db:/var/lib/postgresql/data
+    ports:
+      - '5434:5432'
+    expose:
+      - '5434'
+  # Set up the api service
+  # Fill in the path of docker file  to be used
+  # Allow the api to be connected with port 8000
+  # on the host. Sync all files to the teacher_app-api
+  # folder in the container.
+  # Load env variables to allow the api connect to the db 
+  # and set debug options for the app, this case True for
+  # development. Pass in the development env secret key.
+  api:
+    restart: always
+    build:
+      context: ./
+      dockerfile: docker_dev/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/teacher_app-api
+    environment:
+      DATABASE_NAME: teacher_app_db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: tktktktktkt
+      DATABASE_HOST: database
+      DATABASE_PORT: 5432
+      APP_DEBUG_MODE: $APP_DEBUG_MODE
+      SECRET_KEY: $SECRET_KEY
+    depends_on:
+      - database
+    entrypoint: ["/bin/bash", "/teacher_app-api/docker_dev/start_api.sh"]
+    stdin_open: true
+    tty: true
+  
