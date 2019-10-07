@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.generics import (
@@ -20,7 +21,7 @@ from teacher_app.apps.classes.serializers.class_serializer import (
     ClassSerializer
 )
 
-from teacher_app.apps.classes.models import StudentClass
+from teacher_app.apps.classes.models import StudentClass, Student
 
 """
     View to Add a new Student
@@ -98,3 +99,21 @@ class EditStudentDetailView(UpdateAPIView):
 
             return Response(response_message, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SearchStudentView(RetrieveAPIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get (self, request, student_detail):
+
+        searched_student = Student.objects.filter(
+            Q(firstName__icontains=student_detail) | Q(lastName__icontains=student_detail) | Q(age__icontains=student_detail)
+        )
+
+        response_message = {
+            "data": searched_student.values(),
+            "message": "Student(s) information was successfully retrieved"
+        }
+
+        return Response(response_message, status=status.HTTP_200_OK)

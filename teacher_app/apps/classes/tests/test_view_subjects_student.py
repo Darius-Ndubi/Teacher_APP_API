@@ -21,8 +21,9 @@ class TestViewStudentSubjects(TestCase):
         login_resp = login_response.login_user()
         subject_data = {"regNumber": "11111","maths": "True","english": "False"}
         url = reverse("give_student_subject")
+        client = Client()
 
-        response = self.client.post(
+        response = client.post(
             url,
             data=json.dumps(subject_data),
             content_type='application/json',

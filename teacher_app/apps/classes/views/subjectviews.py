@@ -1,8 +1,10 @@
 from rest_framework import status
+from rest_framework import exceptions 
 
 from rest_framework.generics import (
     CreateAPIView,
-    RetrieveAPIView
+    RetrieveAPIView,
+    UpdateAPIView
 )
 from rest_framework.permissions import (
     IsAuthenticated
@@ -30,8 +32,8 @@ class AssignStudentSubjectView(CreateAPIView):
         student_data = {}
         student_data['student'] = student.id
 
-        SubjectMathSerializer.validate_math_field(request.data['maths'])
-        SubjectEngSerializer.validate_eng_field(request.data['english'])
+        SubjectMathSerializer().validate_math_field(subject_math=request.data['maths'])
+        SubjectEngSerializer().validate_eng_field(subject_eng=request.data['english'])
 
         for (key, value) in request.data.items():
             if key.lower() == 'maths' and request.data[key] == 'True':
@@ -91,6 +93,48 @@ class ViewStudentSubjects(RetrieveAPIView):
         response_message = {
             "subjects": data,
             "message": "Student RegNo:{regNumber} is taking the above subject(s)".format(regNumber=reg_num)
+        }
+
+        return Response(response_message, status=status.HTTP_200_OK)
+
+class FilterStudentSubjectView(RetrieveAPIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, subject_name):
+
+        if subject_name =='maths':
+            queryset = StudentSubjectMath.objects.all()
+
+            response_message={
+                "students": queryset.values()
+            }
+            return Response(response_message, status=status.HTTP_200_OK)
+
+        elif subject_name =='english':
+            queryset = StudentSubjectEng.objects.all()
+
+            response_message={
+                "students": queryset.values()
+            }
+            return Response(response_message, status=status.HTTP_200_OK)
+
+        raise exceptions.NotFound({
+            "message": "Subject {subject} not Found".format(subject=subject_name) 
+    })
+
+
+class AssignStudentSubjectScoreView(UpdateAPIView):
+
+    def put(self, request, reg_num):
+
+        AddStudentSerializer.check_if_student_exists(reg_num)
+
+        SubjectMathSerializer.update(regNum=reg_num, data=request.data)
+        SubjectEngSerializer.update(regNum=reg_num, data=request.data)
+
+        response_message={
+            "message": "Successfully assigned scores to student {regNumber}".format(regNumber=reg_num)
         }
 
         return Response(response_message, status=status.HTTP_200_OK)
