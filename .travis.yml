@@ -1,0 +1,36 @@
+# Language used
+language: python
+
+# Python version used
+python:
+  - "3.6"
+
+# Command to start postgresql
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.6"
+
+#Make some migrations
+before_script:
+ - psql -c "CREATE DATABASE teacher_app;" -U postgres
+ - python manage.py makemigrations
+ - python manage.py migrate
+ - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+ - chmod +x ./cc-test-reporter
+
+
+# Packages to be installed
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+
+script:
+  #Command to run tests
+  - coverage run --source=teacher_app/apps manage.py test teacher_app/apps
+  - coverage report
+
+  after_success:
+   #send coverage to coveralls
+   - coveralls
