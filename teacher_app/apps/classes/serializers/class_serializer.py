@@ -2,9 +2,10 @@ from django.core import exceptions
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework import exceptions as rest_exception
 
-from .models import StudentClass, Student
-from ..authentication.models import User
+from ..models import StudentClass
+from ...authentication.models import User
 
 
 class ClassSerializer(serializers.ModelSerializer):
@@ -30,10 +31,33 @@ class ClassSerializer(serializers.ModelSerializer):
             raise exceptions.PermissionDenied()
         return data
 
+    @staticmethod
+    def check_if_teacher_is_owner(classname, teacher_id):
+        class_teacher = StudentClass.objects.get(className=classname)
+        if class_teacher.teacher.id != teacher_id:
+            raise exceptions.PermissionDenied()
+        return classname, teacher_id
+
+    @staticmethod
+    def check_if_class_exists(classname):
+        try:
+            searched_class = StudentClass.objects.get(className=classname)
+        except StudentClass.DoesNotExist:
+            raise rest_exception.NotFound({
+                "message": "Class {classname} was not found".format(classname=classname)
+            })
+        return searched_class
+
     def create(self, data):
         new_class = StudentClass(**data)
         new_class.save()
         return new_class
+
+    def update(self, instance, edited_data):
+        for (key, value) in edited_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
 
 
 class ViewClassesSerializer(serializers.ModelSerializer):
@@ -45,39 +69,3 @@ class ViewClassesSerializer(serializers.ModelSerializer):
     def retrieve_my_classes(request):
         my_classes = StudentClass.objects.all().filter(teacher=request.user.id)
         return my_classes.values('className', 'teacher')
-
-
-class AddStudentSerializer(serializers.ModelSerializer):
-    firstName = serializers.CharField(required=True)
-    lastName = serializers.CharField(required=True)
-    age = serializers.IntegerField(required=True)
-    regNumber = serializers.CharField(required=True, validators={
-        UniqueValidator(
-            queryset=Student.objects.all(),
-            message=(
-                "Student's registration number should be unique"
-            )
-        )
-    })
-    className = serializers.PrimaryKeyRelatedField(queryset=StudentClass.objects.all())
-
-    class Meta:
-        model = Student
-        fields = ['firstName', 'lastName', 'age', 'regNumber', 'className']
-
-    def create(self, data):
-        new_student = Student(**data)
-        new_student.save()
-        return new_student
-
-
-class ViewStudentsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Student
-        fields = '__all__'
-
-    @staticmethod
-    def students_of_class(class_name):
-        class_id = StudentClass.objects.get(className=class_name)
-        all_students = Student.objects.all().filter(className=class_id.id)
-        return all_students.values('firstName', 'lastName', 'age', 'regNumber')

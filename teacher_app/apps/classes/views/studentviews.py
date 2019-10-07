@@ -3,7 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import (
     CreateAPIView,
-    RetrieveAPIView
+    RetrieveAPIView,
+    UpdateAPIView
 )
 from rest_framework.permissions import (
     IsAuthenticated,
@@ -11,11 +12,15 @@ from rest_framework.permissions import (
 )
 from rest_framework.response import Response
 
-from ..serializers import (
+from teacher_app.apps.classes.serializers.student_serializers import (
     AddStudentSerializer,
     ViewStudentsSerializer
 )
-from ..models import StudentClass
+from teacher_app.apps.classes.serializers.class_serializer import (
+    ClassSerializer
+)
+
+from teacher_app.apps.classes.models import StudentClass
 
 """
     View to Add a new Student
@@ -67,3 +72,29 @@ class ViewStudentsOfClass(RetrieveAPIView):
             "class {classname}".format(classname=class_name)
         }
         return Response(response_message, status=status.HTTP_200_OK)
+
+
+class EditStudentDetailView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, reg_num):
+
+        student = AddStudentSerializer.check_if_student_exists(reg_num)
+
+        class_name = ClassSerializer.check_if_class_exists(
+            request.data['className'])
+
+        request.data['className'] = class_name.id
+
+        serializer = AddStudentSerializer(
+            instance=student, data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+
+            response_message = {
+                "message": "Student information was successfully updated"
+            }
+
+            return Response(response_message, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

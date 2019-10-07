@@ -32,7 +32,7 @@ class TestviewStudentsOfClass(TestCase):
 
     def test_retrieve_students_of_class(self):
         
-        add_response = self.add_student()
+        self.add_student()
         login_resp = add_student_inst.login_user()
         response =  self.client.get(
             '/api/students/class/1 west/',
