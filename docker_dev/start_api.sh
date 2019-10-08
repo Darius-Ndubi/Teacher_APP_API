@@ -18,5 +18,5 @@ python manage.py migrate
 echo "------------------- Make migrations Done !!! ------------------------"
 
 echo "+++++++++++++++++ Start up the server ++++++++++++++++++++++++"
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
 echo "------------------- Development server up and running ------------------------"

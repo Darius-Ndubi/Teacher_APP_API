@@ -1,9 +1,7 @@
 import json
 from rest_framework import status
-from django.urls import reverse
-from django.test import TestCase,Client
+from django.test import TestCase, Client
 
-from rest_framework.test import APIClient
 
 from teacher_app.apps.classes.tests.test_add_student_class import TestAddstudentClass
 
@@ -12,8 +10,7 @@ add_student_inst = TestAddstudentClass()
 class TestTeacherEditClass(TestCase):
     def setUp(self):
         self.client = Client()
-        self.mock_edit_class={"className": "2 west"}
-
+        self.mock_edit_class = {"className": "2 west"}
 
     def test_edit_class_teacher_no_class_info(self):
         add_student_inst.create_class()

@@ -1,22 +1,21 @@
 import json
 from rest_framework import status
 from django.urls import reverse
-from django.test import TestCase,Client
+from django.test import TestCase, Client
 
-from rest_framework.test import APIClient
-
-from teacher_app.apps.classes.tests.test_view_students_of_class import TestviewStudentsOfClass
-from teacher_app.apps.classes.tests.test_add_student_class import TestAddstudentClass
+from .test_view_students_of_class import TestviewStudentsOfClass
+from .test_add_student_class import TestAddstudentClass
 
 
 add_student_inst = TestviewStudentsOfClass()
-login_response =  TestAddstudentClass()
+login_response = TestAddstudentClass()
+
 
 class TestAssignStudentSubject(TestCase):
     def setUp(self):
         self.client = Client()
         self.url = reverse("give_student_subject")
-        self.subject_data ={"regNumber": "11111","maths": "True","english": "True"}
+        self.subject_data = {"regNumber": "11111", "maths": "True", "english": "True"}
 
     def test_assign_student_subject_wrong_regnumber(self):
         add_student_inst.add_student()
@@ -66,6 +65,5 @@ class TestAssignStudentSubject(TestCase):
             content_type='application/json',
             HTTP_AUTHORIZATION='Token ' + login_resp.data['access_token']
         )
-
         self.assertEqual(response.data['message'], 'You have successfully assigned 11111 to 2 subjects')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

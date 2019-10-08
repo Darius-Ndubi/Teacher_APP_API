@@ -54,7 +54,7 @@ class SubjectEngSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def update(regNum, data):
-        if data['english_score'] is None or type(data['english_score']) is not int:
+        if data['english_score'] is None or type(data['english_score']) != int:
             raise serializers.ValidationError({"message": "Kindly enter the english score"})
 
         updated_math_score = StudentSubjectEng.objects.filter(student_reg_num=regNum).update(score=data['english_score'])

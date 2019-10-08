@@ -5,11 +5,12 @@ from django.test import TestCase,Client
 
 from rest_framework.test import APIClient
 
-from teacher_app.apps.classes.tests.test_view_students_of_class import TestviewStudentsOfClass
-from teacher_app.apps.classes.tests.test_add_student_class import TestAddstudentClass
+from .test_view_students_of_class import TestviewStudentsOfClass
+from .test_add_student_class import TestAddstudentClass
 
 add_student_inst = TestviewStudentsOfClass()
 login_response =  TestAddstudentClass()
+
 
 class TestViewStudentSubjects(TestCase):
 
@@ -19,7 +20,7 @@ class TestViewStudentSubjects(TestCase):
     def assign_student_subject(self):
         add_student_inst.add_student()
         login_resp = login_response.login_user()
-        subject_data = {"regNumber": "11111","maths": "True","english": "False"}
+        subject_data = {"regNumber": "11111", "maths": "True", "english": "True"}
         url = reverse("give_student_subject")
         client = Client()
 
