@@ -15,7 +15,9 @@ from teacher_app.apps.classes.serializers.subject_serializer import (
     SubjectMathSerializer,
     SubjectEngSerializer
 )
-from teacher_app.apps.classes.serializers.student_serializers import AddStudentSerializer
+from teacher_app.apps.classes.serializers.student_serializers import (
+    AddStudentSerializer
+)
 from teacher_app.apps.classes.models import (
     StudentSubjectMath,
     StudentSubjectEng
@@ -31,6 +33,7 @@ class AssignStudentSubjectView(CreateAPIView):
 
         student_data = {}
         student_data['student'] = student.id
+        student_data['className'] = student.className.className
 
         SubjectMathSerializer().validate_math_field(subject_math=request.data['maths'])
         SubjectEngSerializer().validate_eng_field(subject_eng=request.data['english'])
@@ -97,16 +100,17 @@ class ViewStudentSubjects(RetrieveAPIView):
 
         return Response(response_message, status=status.HTTP_200_OK)
 
+
 class FilterStudentSubjectView(RetrieveAPIView):
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request, subject_name):
 
-        if subject_name =='maths':
+        if subject_name == 'maths':
             queryset = StudentSubjectMath.objects.all()
 
-            response_message={
+            response_message = {
                 "students": queryset.values()
             }
             return Response(response_message, status=status.HTTP_200_OK)
@@ -114,7 +118,7 @@ class FilterStudentSubjectView(RetrieveAPIView):
         elif subject_name =='english':
             queryset = StudentSubjectEng.objects.all()
 
-            response_message={
+            response_message = {
                 "students": queryset.values()
             }
             return Response(response_message, status=status.HTTP_200_OK)
@@ -133,7 +137,7 @@ class AssignStudentSubjectScoreView(UpdateAPIView):
         SubjectMathSerializer.update(regNum=reg_num, data=request.data)
         SubjectEngSerializer.update(regNum=reg_num, data=request.data)
 
-        response_message={
+        response_message = {
             "message": "Successfully assigned scores to student {regNumber}".format(regNumber=reg_num)
         }
 

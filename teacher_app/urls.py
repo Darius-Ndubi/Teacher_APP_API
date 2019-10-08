@@ -27,5 +27,8 @@ urlpatterns = [
         include('teacher_app.apps.classes.urls.students_urls')),
     # Subjects related views
     path(
-        'api/subjects/', include('teacher_app.apps.classes.urls.subject_urls'))
+        'api/subjects/', include('teacher_app.apps.classes.urls.subject_urls')),
+    # Score urls
+    path(
+        'api/scores/', include('teacher_app.apps.classes.urls.score_urls'))
 ]
