@@ -9,7 +9,7 @@ chardet==3.0.4
 Click==7.0
 coverage==4.5.4
 coveralls==1.8.2
-cryptography==2.7
+cryptography==3.2
 Django==2.2.8
 django-filter==2.2.0
 djangorestframework==3.10.3
